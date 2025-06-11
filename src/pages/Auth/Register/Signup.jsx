@@ -5,6 +5,7 @@ import { UserAuth } from '../../../context/AuthContext';
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState("");
   const [loading, setLoading] = useState("");
 
@@ -14,11 +15,21 @@ function Signup() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setError("");
+    setLoading(true);
+
+    if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        setLoading(false);
+        return;
+    }
+    
     try {
         const result = await signUpNewUser(email, password) 
         if (result.success) {
             navigate('/dashboard')
+        } else {
+            setError(result.message || "Sign Up failed")
         }
     } catch (err) {
         setError("an error occured");
@@ -50,7 +61,7 @@ function Signup() {
                       </div>
                       <div>
                           <label for="confirm-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
-                          <input type="confirm-password" name="confirm-password" id="confirm-password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required=""/>
+                          <input oncChange={(e) => setConfirmPassword(e.target.value)} type="password" name="confirm-password" id="confirm-password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required=""/>
                       </div>
                       <div class="flex items-start">
                           <div class="flex items-center h-5">
