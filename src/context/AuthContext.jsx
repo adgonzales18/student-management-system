@@ -7,10 +7,10 @@ export const AuthContextProvider = ({children}) => {
     const [session, setSession] = useState(undefined);
     
     // Sign up
-    const signUpNewUser = async() => {
+    const signUpNewUser = async(email, password) => {
         const {data, error} = await supabase.auth.signUp({
           email: email,
-            password: password,  
+          password: password,  
         });
 
         if (error) {
@@ -19,16 +19,6 @@ export const AuthContextProvider = ({children}) => {
         }
         return { success: true, data }
     };
-
-    useEffect(() => {
-        supabase.auth.getSession().then(({data: {session}}) => {
-            getSession(session);
-        });
-
-        supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-        });
-    }, []);
 
     // sign out
     const signOut = () => {
@@ -39,20 +29,64 @@ export const AuthContextProvider = ({children}) => {
     };
 
     // sign in
-    const signInUser =  async({email, password}) => {
+    const signInUser =  async(email, password) => {
         try {
             const {data, error} = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
-        } catch (error) {
-            console.error("an error occured", error);
+
+            if (error) {
+              return { success: false, error };
+            }
+        
+            return { success: true, data };
+          } catch (error) {
+            console.error("An error occurred", error);
+            return { success: false, error };
+          }
+        };
+
+    //sign in & sign up google
+    const signInWithGoogle = async() => {
+        try {
+            const {data, error} = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: "http://localhost:5173/dashboard",
+                  },
+                scopes: 'email profile openid',
+               
+            });
+
+            if (error) {
+                console.error("Google sign-in error", error.message);
+                return
+            }
+        } catch (err) {
+            console.error("Unexpected error with Google Sign-in", err);
         }
     };
 
+    useEffect(() => {
+        async function checkSession() {
+          const { data: { session } } = await supabase.auth.getSession();
+          console.log('Session:', session);
+          setSession(session);
+        }
+        checkSession();
+      
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          setSession(session);
+        });
+      
+        return () => {
+          subscription.unsubscribe();
+        };
+      }, []);
 
     return(
-        <AuthContext.Provider value ={{session, signUpNewUser, signOut}}>
+        <AuthContext.Provider value ={{session, signUpNewUser, signInUser, signOut, signInWithGoogle}}>
             {children}
         </AuthContext.Provider>
     )

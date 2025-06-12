@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
-import { supabase } from './utils/supabaseClient'
-import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
+import React from 'react'
 import Dashboard from './pages/Homepage/dashboard'
+import AuthGuard from './containers/AuthGuard'
+
 
 function App() {
  
     return (
-      <div>Hello Admin</div>
+      <AuthGuard>
+        <div><Dashboard/></div>
+      </AuthGuard>
+      
     )
 
 }
