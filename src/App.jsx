@@ -1,17 +1,19 @@
 import React from 'react'
-import Dashboard from './pages/Homepage/dashboard'
 import AuthGuard from './containers/AuthGuard'
+import AppContainer from './containers/AppContainer'
+import { Outlet } from 'react-router-dom'
 
 
 function App() {
  
     return (
       <AuthGuard>
-        <div><Dashboard/></div>
+        <AppContainer>
+          <Outlet/>
+        </AppContainer>
       </AuthGuard>
       
     )
-
 }
 
 export default App
