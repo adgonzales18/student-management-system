@@ -1,21 +1,27 @@
 import React from 'react'
 import { UserAuth } from '../../context/AuthContext'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
 
 function Dashboard() {
 
-  const { signOut } = UserAuth;
+  const { signOut } = UserAuth();
   const navigate = useNavigate;
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/'); // or your login page
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (
     <div>
         <p>Dashboard</p>
-        <a href="/" onClick={handleSignOut}>Sign Out</a>
+        <Link onClick={handleSignOut}>Sign Out</Link>
     </div>
     
   )

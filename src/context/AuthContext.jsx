@@ -22,9 +22,16 @@ export const AuthContextProvider = ({children}) => {
 
     // sign out
     const signOut = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("There was an error:", error);
+      try {
+        console.log("Attempting to sign out...");
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error("Sign-out error:", error);
+        } else {
+          console.log("Signed out successfully.");
+        }
+      } catch (err) {
+        console.error("Unexpected error during sign out:", err);
       }
     };
 
@@ -52,10 +59,6 @@ export const AuthContextProvider = ({children}) => {
         try {
             const {data, error} = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: {
-                    redirectTo: "http://localhost:5173/dashboard",
-                  },
-                scopes: 'email profile openid',
                
             });
 
